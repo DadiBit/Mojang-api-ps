@@ -17,11 +17,15 @@ if ($Get -eq "Skin" -and ($Username -or $Uuid)) {
 		$Uuid=$(ConvertFrom-JSON -InputObject ($(Invoke-webrequest -URI "https://api.mojang.com/users/profiles/minecraft/$($Username)").Content)).id
 		$Base64Skin=(Invoke-webrequest -URI $(ConvertFrom-JSON -InputObject ($([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($($(ConvertFrom-JSON -InputObject ($(Invoke-webrequest -URI "https://sessionserver.mojang.com/session/minecraft/profile/$($Uuid)").Content)).properties.value)))))).textures.skin.url).Content
 	} elseif (!$Username) {
-	$Username=$(ConvertFrom-JSON -InputObject ($(Invoke-webrequest -URI "https://sessionserver.mojang.com/session/minecraft/profile/$($Uuid)").Content)).name
+		$Username=$(ConvertFrom-JSON -InputObject ($(Invoke-webrequest -URI "https://sessionserver.mojang.com/session/minecraft/profile/$($Uuid)").Content)).name
 		$Base64Skin=(Invoke-webrequest -URI $(ConvertFrom-JSON -InputObject ($([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($($(ConvertFrom-JSON -InputObject ($(Invoke-webrequest -URI "https://sessionserver.mojang.com/session/minecraft/profile/$($Uuid)").Content)).properties.value)))))).textures.skin.url).Content
 	}
 	[IO.File]::WriteAllBytes("$pwd\$($Username).png", $Base64Skin)
 }
-if ($Get -eq "ServerPing" -and $Server) {
-	$Ip=[System.Net.Dns]::GetHostAddresses($Server)[0].IPAddressToString
+if ($Get -eq "ServerStatus" -and $Server) {
+	[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
+	$ServerInfo=ConvertFrom-JSON -InputObject ($(Invoke-webrequest -URI "https://api.mcsrvstat.us/1/$($Server)").Content)
+	echo "$($ServerInfo.version)"
+	echo "$($ServerInfo.players.online) players online of $($ServerInfo.players.max) max"
+	echo "Running on $($ServerInfo.ip):$($ServerInfo.port)"
 }
