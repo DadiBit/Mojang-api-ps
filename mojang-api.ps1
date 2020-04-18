@@ -24,7 +24,7 @@ if ($Get -eq "Skin" -and ($Username -or $Uuid)) {
 }
 if ($Get -eq "ServerStatus" -and $Server) {
 	[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
-	$ServerInfo=ConvertFrom-JSON -InputObject ($(Invoke-webrequest -URI "https://api.mcsrvstat.us/1/$($Server)").Content)
+	$ServerInfo=ConvertFrom-JSON -InputObject ($(Invoke-webrequest -URI "https://api.mcsrvstat.us/2/$($Server)").Content)
 	echo "$($ServerInfo.version)"
 	echo "$($ServerInfo.players.online) players online of $($ServerInfo.players.max) max"
 	echo "Running on $($ServerInfo.ip):$($ServerInfo.port)"
